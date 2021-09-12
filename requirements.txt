@@ -1,0 +1,6 @@
+azure-keyvault-secrets
+azure-identity
+uvicorn[standard]
+fastapi
+pydantic
+duo-client
