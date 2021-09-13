@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  zfs-key-api:
+    build: .
+    image: zfs-key-api
+    ports:
+      - 5000:5000/tcp
+    environment:
+      AZURE_CLIENT_ID: client_id
+      AZURE_CLIENT_SECRET: client_secret
+      AZURE_TENANT_ID: tenant_id
+      DUO_CLIENT_ID: client_id
+      DUO_CLIENT_SECRET: client_secret
+      DUO_API_HOSTNAME: api_hostname
+      DUO_USERNAME: username
+      AZURE_VAULT_URL: vault_url
+      ZFS_KEY_API_TOKEN: token
+    restart: always
