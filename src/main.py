@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ZFS Key API')
     parser.add_argument('-t', '--token', action='store_true',
                         help='Generate a cryptographically secure random token and exit')
-    parser.add_argument('-r', '--root-path',
+    parser.add_argument('-r', '--root-path', default=os.environ.get('ZFS_KEY_API_ROOT_PATH'),
                         help='Set the root path when behind a reverse proxy')
     args = parser.parse_args()
     if args.token:
