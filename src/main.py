@@ -2,7 +2,6 @@ import os
 import argparse
 import secrets
 import re
-from typing import Optional
 
 import uvicorn
 from fastapi import FastAPI, Request, Header, HTTPException
@@ -15,7 +14,8 @@ app = FastAPI()
 _client = AzureClient()
 _auth = DuoAuth()
 _token = os.getenv('ZFS_KEY_API_TOKEN')
-_token_re = re.compile('^[Bb]earer\s+(.*)')
+_token_re = re.compile(r'^[Bb]earer\s+(.*)')
+
 
 class Dataset(BaseModel):
     dataset: str
@@ -33,18 +33,11 @@ def _authenticate(authorization):
         raise HTTPException(status_code=401, detail='Invalid token')
 
 
-@app.get("/datasets/{dataset}")
-def get_key(dataset: str, request: Request, authorization: str=Header(None), response_model=Dataset):
-    _authenticate(authorization)
-    _auth.authenticate(dataset, request.client.host)
-    return Dataset(dataset=dataset, key=_client.get_secret(dataset))
-
-
 @app.get("/datasets")
-def get_key(request: Request, authorization: str=Header(None), response_model=Dataset):
+def get_key(request: Request, authorization: str = Header(None), response_model=Dataset):
     _authenticate(authorization)
     _auth.authenticate(request.client.host, 'all')
-    return [Dataset(dataset=dataset, key=key) for dataset, key in _client.get_secrets()]
+    return [Dataset(dataset=dataset, key=key) for dataset, key in _client.get_secrets().items()]
 
 
 if __name__ == '__main__':
@@ -54,6 +47,7 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--root-path', default=os.environ.get('ZFS_KEY_API_ROOT_PATH', ''),
                         help='Set the root path when behind a reverse proxy')
     args = parser.parse_args()
+
     if args.token:
         print(secrets.token_urlsafe(64))
         raise SystemExit(0)

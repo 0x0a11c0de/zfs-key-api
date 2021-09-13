@@ -1,5 +1,5 @@
 import os
-from azure.core.exceptions import ResourceNotFoundError
+from typing import Dict
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from fastapi import HTTPException
@@ -21,19 +21,16 @@ class AzureClient:
         except Exception as exc:
             raise HTTPException(status_code=401, detail=str(exc))
 
-    def get_secret(self, dataset):
-        client = self._client(SecretClient)
-        try:
-            return client.get_secret(dataset).value
-        except ResourceNotFoundError:
-            raise HTTPException(status_code=404, detail="dataset not found")
-        except Exception as exc:
-            raise HTTPException(status_code=404, detail=str(exc))
-
-    def get_secrets(self):
+    def get_secrets(self) -> Dict[str, str]:
         client = self._client(SecretClient)
         try:
             secret_props = client.list_properties_of_secrets()
-            return [(sp.name, client.get_secret(sp.name).value) for sp in secret_props]
+            datasets = {}
+            for sp in secret_props:
+                dataset, secret = client.get_secret(sp.name).value.split(':')
+                datasets[dataset] = secret
+            return datasets
+        except ValueError:
+            raise HTTPException(status_code=404, detail='Invalid secret format, should be <dataset>:<hex key>')
         except Exception as exc:
             raise HTTPException(status_code=404, detail=str(exc))
