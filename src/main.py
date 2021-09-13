@@ -51,9 +51,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ZFS Key API')
     parser.add_argument('-t', '--token', action='store_true',
                         help='Generate a cryptographically secure random token and exit')
+    parser.add_argument('-r', '--root-path',
+                        help='Set the root path when behind a reverse proxy')
     args = parser.parse_args()
     if args.token:
         print(secrets.token_urlsafe(64))
         raise SystemExit(0)
 
-    uvicorn.run('main:app', host='0.0.0.0', port=5000, log_level='info')
+    uvicorn.run('main:app', host='0.0.0.0', port=5000, log_level='info', root_path=args.root_path)
