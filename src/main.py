@@ -58,4 +58,6 @@ if __name__ == '__main__':
         print(secrets.token_urlsafe(64))
         raise SystemExit(0)
 
+    if args.root_path:
+        print(f'Root path: {args.root_path}')
     uvicorn.run('main:app', host='0.0.0.0', port=5000, log_level='info', root_path=args.root_path)
