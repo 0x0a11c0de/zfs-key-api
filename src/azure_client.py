@@ -28,7 +28,7 @@ class AzureClient:
             datasets = {}
             for sp in secret_props:
                 dataset, secret = client.get_secret(sp.name).value.split(':')
-                datasets[dataset] = secret
+                datasets[dataset.strip()] = secret.strip()
             return datasets
         except ValueError:
             raise HTTPException(status_code=404, detail='Invalid secret format, should be <dataset>:<hex key>')
